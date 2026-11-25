@@ -20,6 +20,13 @@ def main() -> None:
     assert 1 <= len(ENTRY) <= 200, "entry must be 1-200 characters"
     assert ENTRY.strip(), "entry must not be only white space"
     assert "\n" not in ENTRY, "entry must be a single line"
+    # New gate: entry must contain no control characters (U+0000-U+001F,
+    # U+007F) and no unintended consecutive spaces — keeps the text clean
+    # for display and prevents hidden formatting from slipping in.
+    assert all(ord(ch) >= 0x20 and ord(ch) != 0x7F for ch in ENTRY), (
+        "entry must not contain control characters"
+    )
+    assert "  " not in ENTRY, "entry must not contain consecutive spaces"
 
     os.makedirs("/output", exist_ok=True)
     with open("/output/entry.txt", "w", encoding="utf-8") as f:
